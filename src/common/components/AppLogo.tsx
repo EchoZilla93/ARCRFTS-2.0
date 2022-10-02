@@ -16,9 +16,11 @@ const TextSecondary = styled.h3`
 `;
 export const AppLogo = () => {
   return (
-    <LogoConatiner>
-      <TextPrimary>ARCRFTS</TextPrimary>
-      <TextSecondary>civil aviation fleet encyclopedia</TextSecondary>
+    <LogoConatiner role="logo_container">
+      <TextPrimary role="logo_prime_text">ARCRFTS</TextPrimary>
+      <TextSecondary role="logo_secondary_text">
+        civil aviation fleet encyclopedia
+      </TextSecondary>
     </LogoConatiner>
   );
 };

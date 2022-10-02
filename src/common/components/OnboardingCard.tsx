@@ -47,9 +47,9 @@ export const OnboardingCard: React.FC<OnboardingProps> = ({
 }) => {
   return (
     <Card>
-      <CardHeading>{title}</CardHeading>
+      <CardHeading role="card_title">{title}</CardHeading>
       <CardImageContainer />
-      <CardDescription>{description}</CardDescription>
+      <CardDescription role="card_desc">{description}</CardDescription>
     </Card>
   );
 };
