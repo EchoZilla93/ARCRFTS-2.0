@@ -15,10 +15,14 @@ const Card = styled.div`
   border-radius: 14px;
   margin: 10px;
   padding: 15px;
-
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: all 0.3s;
+  &:hover {
+    transform: scale(1.03);
+  }
 `;
 
 const CardHeading = styled.p`

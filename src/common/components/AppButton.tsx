@@ -4,7 +4,7 @@ import { colors } from "../../constants/theme/colors";
 interface AppButtonProps {
   title: string;
   active?: boolean;
-  onClickHandler: () => any;
+  onClickHandler: () => void;
 }
 
 const Button = styled.button`
@@ -29,13 +29,13 @@ export const AppButton: React.FC<AppButtonProps> = ({
 }) => {
   return (
     <Button
-      disabled={active}
+      onClick={onClickHandler}
+      disabled={active ? false : true}
       style={{
         backgroundColor: active
           ? colors.appButton.active
           : colors.appButton.unactive,
       }}
-      onClick={onClickHandler}
     >
       {title}
     </Button>

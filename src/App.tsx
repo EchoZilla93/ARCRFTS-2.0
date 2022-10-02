@@ -1,8 +1,8 @@
-import { WelcomePage } from "./pages/WelcomePage";
+import { AppContainer } from "./common/containers/AppContainer";
 import "./styles/style.css";
 
 function App() {
-  return <WelcomePage />;
+  return <AppContainer />;
 }
 
 export default App;

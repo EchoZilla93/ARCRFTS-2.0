@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { AppButton } from "../common/components/AppButton";
 import { OnboardingCard } from "../common/components/OnboardingCard";
 import { AuthPageConatiner } from "../common/containers/AuthPageContainer";
+import { localStorageItems } from "../constants/local_storage/localStorageItems";
 import { SLIDES_DATA } from "../constants/OnboardingData";
 
 const CardContainer = styled.div`
@@ -10,22 +12,7 @@ const CardContainer = styled.div`
   display: -webkit-box;
   flex-direction: row;
   justify-content: center;
-  overflow: auto;
-`;
-
-const IndicatorContainer = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-evenly;
-  margin-top: 15px;
-`;
-
-const SlideIndicator = styled.div`
-  height: 15px;
-  width: 15px;
-  background-color: #f2f2f2;
-  border-radius: 50px;
-  margin-right: 20px;
+  overflow-y: scroll;
 `;
 
 const ButtonContainer = styled.div`
@@ -35,7 +22,19 @@ const ButtonContainer = styled.div`
 `;
 
 export const WelcomePage = () => {
-  const onButtonClickHandler = () => console.log("navigated");
+  const navigate = useNavigate();
+  const { visited_before } = localStorageItems;
+
+  const onButtonClickHandler = () => {
+    localStorage.setItem(visited_before, "true");
+    navigate("/auth");
+  };
+
+  useEffect(() => {
+    const visited = localStorage.getItem(visited_before);
+    if (visited === "true") navigate("/auth");
+  }, [navigate]);
+
   return (
     <AuthPageConatiner>
       <CardContainer>
@@ -50,16 +49,11 @@ export const WelcomePage = () => {
           );
         })}
       </CardContainer>
-      <IndicatorContainer>
-        {SLIDES_DATA.map((i, indx) => {
-          return <SlideIndicator key={`${indx}${i?.heading}`} />;
-        })}
-      </IndicatorContainer>
       <ButtonContainer>
         <AppButton
           active
           title="Cleared for take-off"
-          onClickHandler={() => onButtonClickHandler()}
+          onClickHandler={onButtonClickHandler}
         />
       </ButtonContainer>
     </AuthPageConatiner>
