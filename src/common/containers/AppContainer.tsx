@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { AuthPage } from "../../pages/AuthPage";
+import { LoginPage } from "../../pages/LoginPage";
+import { SignupPage } from "../../pages/SignupPage";
 import { WelcomePage } from "../../pages/WelcomePage";
 
 export const AppContainer = () => {
@@ -8,7 +9,8 @@ export const AppContainer = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/welcome" element={<WelcomePage />} />
-        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/sign-up" element={<SignupPage />} />
       </Routes>
     </BrowserRouter>
   );
