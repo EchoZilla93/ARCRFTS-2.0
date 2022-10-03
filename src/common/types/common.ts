@@ -6,3 +6,5 @@ export interface ActionType {
     type:string,
     payload?:any
 }
+
+export type AuthInputType = "email" | "password" | "name" | "confirm_password"
