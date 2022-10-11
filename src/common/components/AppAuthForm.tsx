@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
-import { Formik } from "formik";
-import * as Yup from "yup";
 import { colors } from "../../constants/theme/colors";
-import { AppButton } from "./AppButton";
 import { Link } from "react-router-dom";
+import { AppButton } from "./AppButton";
+import Validator from "../../services/Validator";
+import { InputErrorState } from "../types/common";
 
 const AuthConatiner = styled.div`
   display: flex;
@@ -12,10 +12,6 @@ const AuthConatiner = styled.div`
   align-items: center;
 `;
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
 const Input = styled.input`
   width: 363px;
   height: 51px;
@@ -35,95 +31,109 @@ const ButtonContainer = styled.div`
   bottom: 50px;
 `;
 
-type ModeType = "login" | "sign_up";
+const ErrorMsg = styled.h3`
+  color: #ff4d6e;
+  font-family: "Mohave", sans-serif;
+  margin: 10px 0 40px 0;
+`;
 interface AppAuthFormProps {
-  mode: ModeType;
+  mode: "login" | "sign_up";
 }
 
-export const AppAuthForm: React.FC<AppAuthFormProps> = ({ mode }) => {
-  const initialFormikValues =
-    mode === "login"
-      ? { email: "", password: "" }
-      : { email: "", password: "", name: "", role: "", confirm_password: "" };
+type ValidatorFunc = (v: string) =>
+  | {
+      isValid: boolean;
+      message: string;
+    }
+  | undefined;
 
-  const loginSchema = Yup.object({
-    email: Yup.string().required().email(),
-    password: Yup.string().required().max(8).min(6),
+export const AppAuthForm: React.FC<AppAuthFormProps> = ({ mode }) => {
+  const [error, setError] = useState<InputErrorState>({
+    isValid: undefined,
+    msg: "",
   });
-  const signupSchema = Yup.object({
-    name: Yup.string().max(12).min(3).required(),
-    email: Yup.string().required().email(),
-    password: Yup.string().required().max(8).min(6),
-    confirm_password: Yup.string().oneOf(
-      [Yup.ref("password"), null],
-      "Passwords must match"
-    ),
-  });
+  const [readyToSub, setReadytoSub] = useState(false);
+
+  const refObj = {
+    email: useRef<HTMLInputElement>(null),
+    pass: useRef<HTMLInputElement>(null),
+  };
+
+  const inputValidate = (validator: ValidatorFunc, propToValidate: string) => {
+    const checkedV = validator(propToValidate);
+    if (checkedV!.isValid) {
+      setError({ ...error, isValid: true, msg: "" });
+      setReadytoSub(true);
+    }
+    if (!checkedV!.isValid) {
+      setError({
+        ...error,
+        isValid: checkedV!.isValid,
+        msg: checkedV!.message,
+      });
+      setReadytoSub(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log(1);
+  };
   return (
     <AuthConatiner>
-      <Formik
-        initialValues={initialFormikValues}
-        validationSchema={mode === "login" ? loginSchema : signupSchema}
-        onSubmit={(v) => {
-          console.log(v);
+      {mode === "login" && (
+        <>
+          <Input
+            ref={refObj.email}
+            onBlur={() =>
+              inputValidate(Validator.email, refObj.email.current!.value)
+            }
+            name="email"
+            type={"email"}
+            placeholder={"Enter your email"}
+          />
+          <Input
+            ref={refObj.pass}
+            onBlur={() =>
+              inputValidate(Validator.password, refObj.pass.current!.value)
+            }
+            name="password"
+            type={"password"}
+            placeholder={"Enter your password"}
+          />
+        </>
+      )}
+      {mode === "sign_up" && (
+        <>
+          <Input name="name" type={"text"} placeholder={"Name"} />
+          <Input name="email" type={"email"} placeholder={"Email"} />
+          <Input name="password" type={"password"} placeholder={"Password"} />
+          <Input
+            name="confirm_password"
+            type={"password"}
+            placeholder={"Confirm password"}
+          />
+        </>
+      )}
+      {error.isValid === false && <ErrorMsg>{error.msg}</ErrorMsg>}
+      <Link
+        style={{
+          fontFamily: '"Mohave", sans-serif',
+          textDecoration: "none",
+          color: colors.typography.primary_color,
+          textAlign: "center",
+          fontSize: 20,
         }}
+        to={mode === "login" ? "/sign-up" : "/login"}
       >
-        {({ errors, touched, isValidating }) => (
-          <Form>
-            {mode === "login" && (
-              <>
-                <Input
-                  name="email"
-                  type={"email"}
-                  placeholder={"Enter your email"}
-                />
-                <Input
-                  name="password"
-                  type={"password"}
-                  placeholder={"Enter your password"}
-                />
-              </>
-            )}
-            {mode === "sign_up" && (
-              <>
-                <Input name="name" type={"text"} placeholder={"Name"} />
-                <Input name="email" type={"email"} placeholder={"Email"} />
-                <Input
-                  name="password"
-                  type={"password"}
-                  placeholder={"Password"}
-                />
-                <Input
-                  name="confirm_password"
-                  type={"password"}
-                  placeholder={"Confirm password"}
-                />
-              </>
-            )}
-            <Link
-              style={{
-                fontFamily: '"Mohave", sans-serif',
-                textDecoration: "none",
-                color: colors.typography.primary_color,
-                textAlign: "center",
-                fontSize: 20,
-              }}
-              to={mode === "login" ? "/sign-up" : "/login"}
-            >
-              {mode === "login"
-                ? "Create Account"
-                : "I already have an accaount"}
-            </Link>
-            <ButtonContainer>
-              <AppButton
-                active
-                title={mode === "login" ? "Log in" : "Next"}
-                onClickHandler={() => 1}
-              />
-            </ButtonContainer>
-          </Form>
-        )}
-      </Formik>
+        {mode === "login" ? "Create Account" : "I already have an accaount"}
+      </Link>
+      <ButtonContainer>
+        <AppButton
+          active={readyToSub}
+          title={mode === "login" ? "Log in" : "Next"}
+          onClickHandler={handleSubmit}
+        />
+      </ButtonContainer>
     </AuthConatiner>
   );
 };

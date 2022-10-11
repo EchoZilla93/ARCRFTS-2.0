@@ -7,4 +7,10 @@ export interface ActionType {
     payload?:any
 }
 
-export type AuthInputType = "email" | "password" | "name" | "confirm_password"
+export type AuthInputType = "email" | "password" | "name" | "confirm_password";
+
+export interface InputErrorState {
+        isValid?: undefined | boolean;
+        val?: string;
+        msg?: string;
+}
