@@ -36,6 +36,14 @@ const ErrorMsg = styled.h3`
   font-family: "Mohave", sans-serif;
   margin: 10px 0 40px 0;
 `;
+
+const AuthLink = styled(Link)`
+  font-family: "Mohave", sans-serif;
+  text-decoration: none;
+  color: ${colors.typography.primary_color};
+  text-align: "center";
+  font-size: 20px;
+`;
 interface AppAuthFormProps {
   mode: "login" | "sign_up";
 }
@@ -52,27 +60,38 @@ export const AppAuthForm: React.FC<AppAuthFormProps> = ({ mode }) => {
     isValid: undefined,
     msg: "",
   });
-  const [readyToSub, setReadytoSub] = useState(false);
 
   const refObj = {
     email: useRef<HTMLInputElement>(null),
     pass: useRef<HTMLInputElement>(null),
+    confPass: useRef<HTMLInputElement>(null),
+    name: useRef<HTMLInputElement>(null),
+  };
+
+  const resetError = () => {
+    setError({ ...error, isValid: true, msg: "" });
   };
 
   const inputValidate = (validator: ValidatorFunc, propToValidate: string) => {
     const checkedV = validator(propToValidate);
-    if (checkedV!.isValid) {
-      setError({ ...error, isValid: true, msg: "" });
-      setReadytoSub(true);
-    }
+    if (checkedV!.isValid) resetError();
     if (!checkedV!.isValid) {
       setError({
         ...error,
         isValid: checkedV!.isValid,
         msg: checkedV!.message,
       });
-      setReadytoSub(false);
     }
+  };
+
+  const passwordMatch = () => {
+    const { confPass, pass } = refObj;
+    const match = Validator.confirmPass(
+      pass.current!.value,
+      confPass.current!.value
+    );
+    if (match.isValid) resetError();
+    setError({ ...error, isValid: match.isValid, msg: match.message });
   };
 
   const handleSubmit = () => {
@@ -104,10 +123,36 @@ export const AppAuthForm: React.FC<AppAuthFormProps> = ({ mode }) => {
       )}
       {mode === "sign_up" && (
         <>
-          <Input name="name" type={"text"} placeholder={"Name"} />
-          <Input name="email" type={"email"} placeholder={"Email"} />
-          <Input name="password" type={"password"} placeholder={"Password"} />
           <Input
+            ref={refObj.name}
+            onBlur={() =>
+              inputValidate(Validator.userName, refObj.name.current!.value)
+            }
+            name="name"
+            type={"text"}
+            placeholder={"Name"}
+          />
+          <Input
+            ref={refObj.email}
+            onBlur={() =>
+              inputValidate(Validator.email, refObj.email.current!.value)
+            }
+            name="email"
+            type={"email"}
+            placeholder={"Email"}
+          />
+          <Input
+            onBlur={() =>
+              inputValidate(Validator.password, refObj.pass.current!.value)
+            }
+            ref={refObj.pass}
+            name="password"
+            type={"password"}
+            placeholder={"Password"}
+          />
+          <Input
+            onBlur={() => passwordMatch()}
+            ref={refObj.confPass}
             name="confirm_password"
             type={"password"}
             placeholder={"Confirm password"}
@@ -115,21 +160,12 @@ export const AppAuthForm: React.FC<AppAuthFormProps> = ({ mode }) => {
         </>
       )}
       {error.isValid === false && <ErrorMsg>{error.msg}</ErrorMsg>}
-      <Link
-        style={{
-          fontFamily: '"Mohave", sans-serif',
-          textDecoration: "none",
-          color: colors.typography.primary_color,
-          textAlign: "center",
-          fontSize: 20,
-        }}
-        to={mode === "login" ? "/sign-up" : "/login"}
-      >
-        {mode === "login" ? "Create Account" : "I already have an accaount"}
-      </Link>
+      <AuthLink to={mode === "login" ? "/sign-up" : "/login"}>
+        {mode === "login" ? "Create Account" : "I already have an account"}
+      </AuthLink>
       <ButtonContainer>
         <AppButton
-          active={readyToSub}
+          active
           title={mode === "login" ? "Log in" : "Next"}
           onClickHandler={handleSubmit}
         />

@@ -47,12 +47,25 @@ class Validator {
 
   static confirmPass(pass: string, confPass: string) {
     if (pass === confPass) {
-      return;
+      return {
+        isValid: true,
+        message: "",
+      };
     } else {
       return {
         isValid: false,
-        message: `Passwords didn't match`,
+        message: "Passwords not match",
       };
+    }
+  }
+
+  static userName(v: string) {
+    if (v.length >= 3 && v.length <= 12) {
+      return { isValid: true, message: "" };
+    } else if(v.length < 3){
+      return { isValid: false, message: "Name should be at least 3 characters long" };
+    }else{
+      return { isValid: false, message: "Name should be maximum 12 characters long" };
     }
   }
 }
